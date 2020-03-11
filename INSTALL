@@ -1,0 +1,5 @@
+Building Bethel
+
+See doc/build-*.md for instructions on building betheld,
+the intended-for-services, no-graphical-interface, reference
+implementation of Bethel.

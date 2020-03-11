@@ -1,0 +1,8 @@
+/usr/bin/bethel-cli		--	gen_context(system_u:object_r:bethel_exec_t,s0)
+/usr/sbin/betheld		--	gen_context(system_u:object_r:bethel_exec_t,s0)
+/usr/lib(64)?/bethel/betheld		--	gen_context(system_u:object_r:bethel_exec_t,s0)
+
+/etc/bethel(/.*)?		gen_context(system_u:object_r:bethel_conf_t,s0)
+/var/lib/bethel(/.*)?		gen_context(system_u:object_r:bethel_var_lib_t,s0)
+
+(/var)?/run/betheld(/.*)?   gen_context(system_u:object_r:bethel_var_run_t,s0)

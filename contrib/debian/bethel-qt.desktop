@@ -1,0 +1,12 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=Bethel
+Comment=Bethel P2P Cryptocurrency
+Comment[fr]=Bethel, monnaie virtuelle cryptographique pair à pair
+Comment[tr]=Bethel, eşten eşe kriptografik sanal para birimi
+Exec=bethel-qt %u
+Terminal=false
+Type=Application
+Icon=bethel128
+MimeType=x-scheme-handler/bethel;
+Categories=Office;Finance;

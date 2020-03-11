@@ -1,0 +1,6 @@
+usr/local/bin/bethel-qt usr/bin
+share/pixmaps/bethel32.xpm usr/share/pixmaps
+share/pixmaps/bethel16.xpm usr/share/pixmaps
+share/pixmaps/bethel128.png usr/share/pixmaps
+debian/bethel-qt.desktop usr/share/applications
+debian/bethel-qt.protocol usr/share/kde4/services/

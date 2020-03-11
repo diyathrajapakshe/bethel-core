@@ -1,0 +1,81 @@
+policy_module(bethel, 1.100.1)
+
+########################################
+#
+# Declarations
+#
+
+type bethel_t;
+type bethel_exec_t;
+init_daemon_domain(bethel_t, bethel_exec_t)
+
+permissive bethel_t;
+
+type bethel_initrc_exec_t;
+init_script_file(bethel_initrc_exec_t)
+
+type bethel_conf_t;
+files_type(bethel_conf_t)
+
+type bethel_var_lib_t;
+files_type(bethel_var_lib_t)
+
+type bethel_var_run_t;
+files_type(bethel_var_run_t)
+
+type bethel_port_t;
+corenet_port(bethel_port_t)
+
+########################################
+#
+# bethel local policy
+#
+allow bethel_t self:process { fork };
+
+allow bethel_t self:fifo_file rw_fifo_file_perms;
+allow bethel_t self:unix_stream_socket create_stream_socket_perms;
+
+manage_dirs_pattern(bethel_t, bethel_conf_t, bethel_conf_t)
+manage_files_pattern(bethel_t, bethel_conf_t, bethel_conf_t)
+
+manage_dirs_pattern(bethel_t, bethel_var_lib_t, bethel_var_lib_t)
+manage_files_pattern(bethel_t, bethel_var_lib_t, bethel_var_lib_t)
+files_var_lib_filetrans(bethel_t, bethel_var_lib_t, { dir file })
+
+manage_dirs_pattern(bethel_t, bethel_var_run_t, bethel_var_run_t)
+manage_files_pattern(bethel_t, bethel_var_run_t, bethel_var_run_t)
+
+sysnet_dns_name_resolve(bethel_t)
+corenet_all_recvfrom_unlabeled(bethel_t)
+
+allow bethel_t self:tcp_socket create_stream_socket_perms;
+corenet_tcp_sendrecv_generic_if(bethel_t)
+corenet_tcp_sendrecv_generic_node(bethel_t)
+corenet_tcp_sendrecv_all_ports(bethel_t)
+corenet_tcp_bind_generic_node(bethel_t)
+
+gen_require(`
+    type bethel_port_t;
+')
+allow bethel_t bethel_port_t:tcp_socket name_bind;
+
+gen_require(`
+    type bethel_port_t;
+')
+allow bethel_t bethel_port_t:tcp_socket name_connect;
+
+domain_use_interactive_fds(bethel_t)
+
+files_read_etc_files(bethel_t)
+
+miscfiles_read_localization(bethel_t)
+
+sysnet_dns_name_resolve(bethel_t)
+
+allow bethel_t bethel_exec_t:file execute_no_trans;
+allow bethel_t self:process setsched;
+corecmd_exec_ls(bethel_t)
+corenet_tcp_connect_http_port(bethel_t)
+dev_read_urand(bethel_t)
+fs_getattr_xattr_fs(bethel_t)
+kernel_read_system_state(bethel_t)

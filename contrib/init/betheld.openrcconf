@@ -1,0 +1,33 @@
+# /etc/conf.d/betheld: config file for /etc/init.d/betheld
+
+# Config file location
+#BETHELD_CONFIGFILE="/etc/bethel/bethel.conf"
+
+# What directory to write pidfile to?  (created and owned by $BETHELD_USER)
+#BETHELD_PIDDIR="/var/run/betheld"
+
+# What filename to give the pidfile
+#BETHELD_PIDFILE="${BETHELD_PIDDIR}/betheld.pid"
+
+# Where to write betheld data (be mindful that the blockchain is large)
+#BETHELD_DATADIR="/var/lib/betheld"
+
+# User and group to own betheld process
+#BETHELD_USER="bethel"
+#BETHELD_GROUP="bethel"
+
+# Path to betheld executable
+#BETHELD_BIN="/usr/bin/betheld"
+
+# Nice value to run betheld under
+#BETHELD_NICE=0
+
+# Additional options (avoid -conf and -datadir, use flags above)
+BETHELD_OPTS="-disablewallet"
+
+# The timeout in seconds OpenRC will wait for betheld to terminate
+# after a SIGTERM has been raised.
+# Note that this will be mapped as argument to start-stop-daemon's
+# '--retry' option, which means you can specify a retry schedule
+# here. For more information see man 8 start-stop-daemon.
+BETHELD_SIGTERM_TIMEOUT=60

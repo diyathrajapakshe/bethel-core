@@ -1,0 +1,92 @@
+#!/sbin/runscript
+
+# backward compatibility for existing gentoo layout 
+#
+if [ -d "/var/lib/bethel/.bethel" ]; then
+	BETHELD_DEFAULT_DATADIR="/var/lib/bethel/.bethel"
+else
+	BETHELD_DEFAULT_DATADIR="/var/lib/betheld"
+fi
+
+BETHELD_CONFIGFILE=${BETHELD_CONFIGFILE:-/etc/bethel/bethel.conf}
+BETHELD_PIDDIR=${BETHELD_PIDDIR:-/var/run/betheld}
+BETHELD_PIDFILE=${BETHELD_PIDFILE:-${BETHELD_PIDDIR}/betheld.pid}
+BETHELD_DATADIR=${BETHELD_DATADIR:-${BETHELD_DEFAULT_DATADIR}}
+BETHELD_USER=${BETHELD_USER:-${BETHEL_USER:-bethel}}
+BETHELD_GROUP=${BETHELD_GROUP:-bethel}
+BETHELD_BIN=${BETHELD_BIN:-/usr/bin/betheld}
+BETHELD_NICE=${BETHELD_NICE:-${NICELEVEL:-0}}
+BETHELD_OPTS="${BETHELD_OPTS:-${BETHEL_OPTS}}"
+
+name="Bethel Core Daemon"
+description="Bethel cryptocurrency P2P network daemon"
+
+command="/usr/bin/betheld"
+command_args="-pid=\"${BETHELD_PIDFILE}\" \
+		-conf=\"${BETHELD_CONFIGFILE}\" \
+		-datadir=\"${BETHELD_DATADIR}\" \
+		-daemon \
+		${BETHELD_OPTS}"
+
+required_files="${BETHELD_CONFIGFILE}"
+start_stop_daemon_args="-u ${BETHELD_USER} \
+			-N ${BETHELD_NICE} -w 2000"
+pidfile="${BETHELD_PIDFILE}"
+
+# The retry schedule to use when stopping the daemon. Could be either
+# a timeout in seconds or multiple signal/timeout pairs (like
+# "SIGKILL/180 SIGTERM/300")
+retry="${BETHELD_SIGTERM_TIMEOUT}"
+
+depend() {
+	need localmount net
+}
+
+# verify
+# 1) that the datadir exists and is writable (or create it)
+# 2) that a directory for the pid exists and is writable
+# 3) ownership and permissions on the config file
+start_pre() {
+	checkpath \
+	-d \
+	--mode 0750 \
+	--owner "${BETHELD_USER}:${BETHELD_GROUP}" \
+	"${BETHELD_DATADIR}"
+
+	checkpath \
+	-d \
+	--mode 0755 \
+	--owner "${BETHELD_USER}:${BETHELD_GROUP}" \
+	"${BETHELD_PIDDIR}"
+
+	checkpath -f \
+	-o ${BETHELD_USER}:${BETHELD_GROUP} \
+	-m 0660 \
+	${BETHELD_CONFIGFILE}
+
+	checkconfig || return 1
+}
+
+checkconfig()
+{
+	if ! grep -qs '^rpcpassword=' "${BETHELD_CONFIGFILE}" ; then
+		eerror ""
+		eerror "ERROR: You must set a secure rpcpassword to run betheld."
+		eerror "The setting must appear in ${BETHELD_CONFIGFILE}"
+		eerror ""
+		eerror "This password is security critical to securing wallets "
+		eerror "and must not be the same as the rpcuser setting."
+		eerror "You can generate a suitable random password using the following"
+		eerror "command from the shell:"
+		eerror ""
+		eerror "bash -c 'tr -dc a-zA-Z0-9 < /dev/urandom | head -c32 && echo'"
+		eerror ""
+		eerror "It is also recommended that you also set alertnotify so you are "
+		eerror "notified of problems:"
+		eerror ""
+		eerror "ie: alertnotify=echo %%s | mail -s \"Bethel Alert\"" \
+			"admin@foo.com"
+		eerror ""
+		return 1
+	fi
+}
